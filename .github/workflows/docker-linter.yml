@@ -1,0 +1,35 @@
+name: Docker Linter
+
+on:   
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 3' # Every wednesday
+
+jobs:
+  build:
+    name: Lint
+    runs-on: ubuntu-20.04
+ 
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C80E383C3DE9F082E01391A0366C67DE91CA5D5F
+        sudo apt-get -y install apt-transport-https
+        echo "deb https://packages.cisofy.com/community/lynis/deb/ stable main" | sudo tee /etc/apt/sources.list.d/cisofy-lynis.list
+        sudo apt-get update
+        sudo apt-get -y install lynis
+        curl -sL -o ./hadolint "https://github.com/hadolint/hadolint/releases/download/v1.19.0/hadolint-$(uname -s)-$(uname -m)"
+        chmod 700 ./hadolint
+
+    - name: Lint with hadolint
+      run: |
+        ./hadolint --ignore DL3013 --ignore DL3003 --ignore DL3008 --ignore DL4006 Dockerfile
+
+    - name: Security scan with Lynis
+      run:  |
+        sudo lynis audit dockerfile Dockerfile --no-colors

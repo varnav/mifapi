@@ -1,0 +1,21 @@
+name: Docker Builder
+
+on:   
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 3' # Every wednesday
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+ 
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build the Docker image
+      run: |
+        docker build -t varnav/mifapi .
