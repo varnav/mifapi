@@ -5,6 +5,11 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+if [ $(grep -c avx2 /proc/cpuinfo) == 0 ]
+  then echo "AVX2 support required"
+  exit
+fi
+
 set -ex
 
 DEBIAN_FRONTEND=noninteractive

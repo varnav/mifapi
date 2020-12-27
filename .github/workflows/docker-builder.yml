@@ -20,4 +20,4 @@ jobs:
       run: docker build -t varnav/mifapi .
 
     - name: Test Docker image
-      run: docker run --rm -it --tmpfs /tmp/mifapi_temp --entrypoint /app/pytest.sh varnav/mifapi
+      run: docker run --rm --tmpfs /tmp/mifapi_temp --entrypoint /app/pytest.sh varnav/mifapi

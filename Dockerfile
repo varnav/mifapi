@@ -9,8 +9,20 @@ RUN /bin/bash ./build_avif.sh
 # Docs https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
+LABEL Maintainer = "Evgeny Varnavskiy <varnavruz@gmail.com>"
+LABEL Description="mifapi: Modern Image Formats (JPEG XL and AVIF) Web API"
+LABEL License="MIT License"
+
+LABEL org.label-schema.schema-version="1.0"
+LABEL org.label-schema.url="https://avif.photos"
+LABEL org.label-schema.vcs-url="https://github.com/varnav/mifapi"
+LABEL org.label-schema.docker.cmd="docker run -d --name mifapi --restart on-failure:10 --security-opt no-new-privileges --tmpfs /tmp/mifapi_temp -p 80:80 -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt mycoolcompany/mifapi"
+LABEL org.label-schema.docker.cmd.test="docker run --rm -it --tmpfs /tmp/mifapi_temp --entrypoint /app/pytest.sh varnav/mifapi"
+
 ENV PORT=8000
 ENV DEBIAN_FRONTEND=noninteractive
+#ENV ACCESS_LOG=/var/log/gunicorn/access.log
+#ENV ERROR_LOG=/var/log/gunicorn/error.log
 
 # Compile with forced AVX2 support
 ENV RUSTFLAGS="-C target-feature=+avx2,+fma"
@@ -26,16 +38,19 @@ RUN set -ex && \
     python -m pip install -U pip && \
     python -m pip install poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-dev && \
-    apt-get update && apt-get install --no-install-recommends -y libgif-dev nginx software-properties-common ca-certificates && \
+    poetry install --no-dev
+
+RUN apt-get update && apt-get install --no-install-recommends -y libgif-dev nginx software-properties-common ca-certificates && \
     mkdir /tmp/mifapi_temp && \
+    mkdir /var/log/gunicorn && \
     chmod 777 /tmp/mifapi_temp && \
     ln -s /tmp/mifapi_temp /html/getfile && \
     nginx -t && \
-    python -m pip install pytest certbot certbot-nginx && \
+    python -m pip install tailon pytest certbot certbot-nginx && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    openssl dhparam -out /etc/nginx/dhparam.pem 2048
+    rm -rf /var/lib/apt/lists/*
+
+RUN openssl dhparam -out /etc/nginx/dhparam.pem 2048
 
 COPY ./html /html/
 COPY nginx.conf /etc/nginx/nginx.conf

@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "jxl-api"
-version = "0.1.0"
-description = "JPEG XL encoder/decoder API"
+name = "mifapi"
+version = "0.3.0"
+description = "mifapi: Modern Image Formats (JPEG XL and AVIF) Web API"
 authors = ["Evgeny Varnavskiy <varnavruz@gmail.com>"]
 license = "MIT"
 

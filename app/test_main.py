@@ -142,7 +142,7 @@ def test_download_1():
 
 
 def test_download_2():
-    time.sleep(5)
+    time.sleep(8)
     response = client.get("/getfile/testimage2.jxl")
     assert response.status_code == 200
 

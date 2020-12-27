@@ -25,7 +25,7 @@ executors = {
 }
 scheduler = BackgroundScheduler(executors=executors)
 scheduler.start()
-app = FastAPI(title="mifapi: Modern Image Formats (JPEG XL and AVIF) API", version=__version__, openapi_url="/api/v1/openapi.json")
+app = FastAPI(title="mifapi: Modern Image Formats (JPEG XL and AVIF) Web API", version=__version__, openapi_url="/api/v1/openapi.json")
 
 mimetypes.init()
 mimetypes.add_type('image/jxl', '.jxl')
@@ -91,7 +91,7 @@ async def add_process_time_header(request: Request, call_next):
 
 
 class Version(BaseModel):
-    ver: str
+    ver: str = __version__
     cjxl_ver: str
     avifenc_ver: str
 
