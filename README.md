@@ -1,12 +1,24 @@
 # mifapi: Modern Image Formats (JPEG XL and AVIF) API
 
-File transcoding happens in RAM only, files are not saved, and deleted after some time (300 seconds by default).
+File transcoding happens in RAM only, files are not saved, and deleted after some time (300 seconds by default).   
+All components of the app will correctly utilize multiple CPU cores.  
+Asyncronous converters will output dowload URL of the file, but actual transcoding will be done few seconds later, and
+not guaranteed to succeed.
+
 
 ## Live demo
 
 https://jxl.photos
 
 https://avif.photos
+
+## How to use
+
+### shell one-liner
+
+```sh
+curl -X POST "https://jxl.photos/api/v1/jxl/encode" -H  "accept: application/json" -H  "Content-Type: multipart/form-data" -F "file=@IMG_20201219_142048.JPG;type=image/jpeg" | python3 -c "import sys, json; print(json.load(sys.stdin)['dl_uri'])" | xargs -n1 curl -O
+```
 
 ## Run app quickly
 

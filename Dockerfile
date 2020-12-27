@@ -12,6 +12,11 @@ FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 ENV PORT=8000
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Compile with forced AVX2 support
+ENV RUSTFLAGS="-C target-feature=+avx2,+fma"
+ENV CFLAGS="-mavx2 -mfma -ftree-vectorize -pipe"
+ENV CXXFLAGS="${CFLAGS}"
+
 COPY --from=builder /tmp/jpeg-xl/build/tools/djxl /tmp/jpeg-xl/build/tools/cjxl /tmp/libavif/build/avifenc /usr/bin/
 
 COPY ./pyproject.toml .
@@ -21,7 +26,7 @@ RUN set -ex && \
     python -m pip install -U pip && \
     python -m pip install poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-root --no-dev && \
+    poetry install --no-dev && \
     apt-get update && apt-get install --no-install-recommends -y libgif-dev nginx software-properties-common ca-certificates && \
     mkdir /tmp/mifapi_temp && \
     chmod 777 /tmp/mifapi_temp && \
@@ -34,6 +39,6 @@ RUN set -ex && \
 
 COPY ./html /html/
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY ./app /app/
+COPY ./app/main.py ./app/prestart.sh ./app/pytest.sh ./app/test_main.py /app/
 
 EXPOSE 443

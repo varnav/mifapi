@@ -14,7 +14,7 @@ from fastapi.requests import Request
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-__version__ = '0.2.2'
+__version__ = '0.3.0'
 TTL = 300
 JXL_SUPPORTED_FORMATS = ['jpeg', 'jpg', 'png', 'apng', 'gif', 'exr', 'ppm', 'pfm', 'pgx']
 AVIF_SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "y4m"]
@@ -32,6 +32,7 @@ mimetypes.add_type('image/jxl', '.jxl')
 
 tempdir = tempfile.gettempdir() + os.sep + 'mifapi_temp'
 
+# Static files are normally handled by nginx in the Docker container. This is for testing and development.
 if not os.path.exists(tempdir):
     os.mkdir(tempdir)
 app.mount(app.root_path + "/getfile", StaticFiles(directory=tempdir))
@@ -55,7 +56,12 @@ def encodejxl(fp, newpath):
     speed = 'kitten'
     convert_cmd = f'/usr/bin/cjxl -s {speed} --num_threads={jobs} "{fp}" "{newpath}"'
     print(convert_cmd)
-    run(convert_cmd, shell=True)
+    job = run(convert_cmd, shell=True)
+    if job.returncode == 0:
+        saved = os.path.getsize(fp) - os.path.getsize(newpath)
+        return saved
+    else:
+        raise HTTPException(status_code=500, detail="Conversion error")
 
 
 def encodeavif(fp, newpath, codec):
@@ -65,9 +71,14 @@ def encodeavif(fp, newpath, codec):
     """
     print("Async encode", fp, newpath, codec)
     speed = 9
-    convert_cmd = f'avifenc -j {jobs} -c {codec} -s {speed} {fp} -o {newpath}'
+    convert_cmd = f'avifenc -d 8 -y 420 -j {jobs} -c {codec} -s {speed} {fp} -o {newpath}'
     print(convert_cmd)
-    run(convert_cmd, shell=True)
+    job = run(convert_cmd, shell=True)
+    if job.returncode == 0:
+        saved = os.path.getsize(fp) - os.path.getsize(newpath)
+        return saved
+    else:
+        raise HTTPException(status_code=500, detail="Conversion error")
 
 
 @app.middleware("http")
@@ -79,9 +90,10 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-@app.get("/api/v1/version")
-def version():
-    return {"ver": __version__, "cjxl_ver": run(['cjxl', '--version'], capture_output=True).stdout, "avifenc_ver": run(['avifenc', '--version'], capture_output=True).stdout}
+class Version(BaseModel):
+    ver: str
+    cjxl_ver: str
+    avifenc_ver: str
 
 
 class Encoded(BaseModel):
@@ -100,7 +112,12 @@ class Decoded(BaseModel):
     file_ttl_sec: int = TTL
 
 
-@app.post("/api/v1/jxl/encode", response_model=Encoded, description="Encode file into jxl (lossless if JPEG)")
+@app.get("/api/v1/version", response_model=Version, summary="Return versions of used libraries")
+def version():
+    return {"ver": __version__, "cjxl_ver": run(['cjxl', '--version'], capture_output=True).stdout, "avifenc_ver": run(['avifenc', '--version'], capture_output=True).stdout}
+
+
+@app.post("/api/v1/jxl/encode", response_model=Encoded, summary="Encode file into jxl (lossless if JPEG)")
 def encode_jxl(request: Request, file: UploadFile = File(...)):
     extension = os.path.splitext(file.filename)[1][1:]
     if extension.lower() not in JXL_SUPPORTED_FORMATS:
@@ -114,19 +131,11 @@ def encode_jxl(request: Request, file: UploadFile = File(...)):
         f = open(fp, 'wb')
         f.write(file.file.read())
         f.close()
-        speed = 'kitten'
-        convert_cmd = f'/usr/bin/cjxl --quiet -s {speed} --num_threads={jobs} "{fp}" "{newpath}"'
-        print(convert_cmd)
-        job = run(convert_cmd, shell=True)
-        if job.returncode == 0:
-            saved = os.path.getsize(fp) - os.path.getsize(newpath)
-            scheduler.add_job(cleanup, 'date', args=[fp, newpath], next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=TTL))
-            return {"bytes_saved": saved, "dl_uri": str(request.base_url) + 'getfile/' + parse.quote(str(newfilename)), "file_ttl_sec": TTL}
-        else:
-            raise HTTPException(status_code=500, detail="Conversion error")
+        saved = encodejxl(fp, newpath)
+        return {"bytes_saved": saved, "dl_uri": str(request.base_url) + 'getfile/' + parse.quote(str(newfilename)), "file_ttl_sec": TTL}
 
 
-@app.post("/api/v1/jxl/encodeasync", response_model=EncodedNosize, description="Async encode file into jxl (lossless if JPEG)")
+@app.post("/api/v1/jxl/encodeasync", response_model=EncodedNosize, summary="Async encode file into jxl (lossless if JPEG)")
 async def encode_jxl_async(request: Request, file: UploadFile = File(...)):
     extension = os.path.splitext(file.filename)[1][1:]
     if extension.lower() not in JXL_SUPPORTED_FORMATS:
@@ -145,7 +154,26 @@ async def encode_jxl_async(request: Request, file: UploadFile = File(...)):
         return {"dl_uri": str(request.base_url) + 'getfile/' + parse.quote(str(newfilename)), "file_ttl_sec": TTL}
 
 
-@app.post("/api/v1/avif/encodeasync", response_model=EncodedNosize, description="Async encode file into AVIF")
+@app.post("/api/v1/avif/encode", response_model=EncodedNosize, summary="Async encode file into AVIF")
+async def encode_avif(request: Request, file: UploadFile = File(...), codec: str = 'aom'):
+    extension = os.path.splitext(file.filename)[1][1:]
+    if extension.lower() not in AVIF_SUPPORTED_FORMATS:
+        raise HTTPException(status_code=415, detail="Unsupported media type")
+    fp = pathlib.PurePath(tempdir + os.sep + file.filename)
+    newfilename = str(fp.stem) + '.' + 'avif'
+    newpath = tempdir + os.sep + newfilename
+    if os.path.exists(newpath) or os.path.exists(fp):
+        raise HTTPException(status_code=409, detail="File exists")
+    else:
+        f = open(fp, 'wb')
+        f.write(file.file.read())
+        f.close()
+        saved = encodeavif(fp, newpath, codec)
+        scheduler.add_job(cleanup, 'date', args=[fp, newpath], next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=TTL))
+        return {"bytes_saved": saved, "dl_uri": str(request.base_url) + 'getfile/' + parse.quote(str(newfilename)), "file_ttl_sec": TTL}
+
+
+@app.post("/api/v1/avif/encodeasync", response_model=EncodedNosize, summary="Async encode file into AVIF")
 async def encode_avif_async(request: Request, file: UploadFile = File(...), codec: str = 'aom'):
     extension = os.path.splitext(file.filename)[1][1:]
     if extension.lower() not in AVIF_SUPPORTED_FORMATS:
@@ -164,7 +192,7 @@ async def encode_avif_async(request: Request, file: UploadFile = File(...), code
         return {"dl_uri": str(request.base_url) + 'getfile/' + parse.quote(str(newfilename)), "file_ttl_sec": TTL}
 
 
-@app.post("/api/v1/jxl/decode", response_model=Decoded, description="Lossless decode jxl into jpeg")
+@app.post("/api/v1/jxl/decode", response_model=Decoded, summary="Lossless decode jxl into jpeg")
 def decode_jpg(request: Request, file: UploadFile = File(...)):
     extension = os.path.splitext(file.filename)[1][1:]
     if extension.lower() not in ['jxl']:
