@@ -2,7 +2,7 @@
 
 ## Run app
 
-You will need cjxl in path. You can get it by running build_cjxl.sh as root.
+You will need `cjxl`, `djxl`, `avifenc` in PATH. You can get it by running `build_cjxl.sh` and `build_avif.sh` as root.
 
 ```sh
 poetry install

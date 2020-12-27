@@ -13,7 +13,7 @@ from fastapi.requests import Request
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 TTL = 300
 JXL_SUPPORTED_FORMATS = ['jpeg', 'jpg', 'png', 'apng', 'gif', 'exr', 'ppm', 'pfm', 'pgx']
 AVIF_SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "y4m"]
@@ -132,7 +132,7 @@ async def encode_jxl_async(request: Request, file: UploadFile = File(...)):
         f = open(fp, 'wb')
         f.write(file.file.read())
         f.close()
-        scheduler.add_job(encodejxl, 'date', args=[fp, newpath], next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=5))
+        scheduler.add_job(encodejxl, 'date', args=[fp, newpath], next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=2))
         scheduler.add_job(cleanup, 'date', args=[fp, newpath], next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=TTL))
         return {"dl_uri": str(request.base_url) + 'getfile/' + parse.quote(str(newfilename)), "file_ttl_sec": TTL}
 
@@ -151,7 +151,7 @@ async def encode_avif_async(request: Request, file: UploadFile = File(...), code
         f = open(fp, 'wb')
         f.write(file.file.read())
         f.close()
-        scheduler.add_job(encodeavif, 'date', args=[fp, newpath, codec], next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=5))
+        scheduler.add_job(encodeavif, 'date', args=[fp, newpath, codec], next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=2))
         scheduler.add_job(cleanup, 'date', args=[fp, newpath], next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=TTL))
         return {"dl_uri": str(request.base_url) + 'getfile/' + parse.quote(str(newfilename)), "file_ttl_sec": TTL}
 
