@@ -15,9 +15,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 COPY --from=builder /tmp/jpeg-xl/build/tools/djxl /tmp/jpeg-xl/build/tools/cjxl /tmp/libavif/build/avifenc /usr/bin/
 
 COPY ./pyproject.toml .
-COPY ./html /html/
 
 RUN set -ex && \
+    mkdir /html && \
     python -m pip install -U pip && \
     python -m pip install poetry && \
     poetry config virtualenvs.create false && \
@@ -32,6 +32,7 @@ RUN set -ex && \
     rm -rf /var/lib/apt/lists/* && \
     openssl dhparam -out /etc/nginx/dhparam.pem 2048
 
+COPY ./html /html/
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY ./app /app/
 

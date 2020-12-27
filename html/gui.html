@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <title>mifapi: GUI example</title>
+  </head>
+  <body>
+    <h1>mifapi: GUI example</h1>
+
+<form method="post" enctype="multipart/form-data" action="https://jxl.photos/api/v1/jxl/encode" id="my_form">
+    <input type="file" name="my_file[]" />
+    <input type="submit" name="submit" value="Submit Form" />
+    <div id="server-results"><!-- For server results --></div>
+</form>
+    <div id="upload-progress"><div class="progress-bar"></div></div>
+
+  <script>
+$("#my_form").submit(function(event){
+    event.preventDefault(); //prevent default action
+    var post_url = $(this).attr("action"); //get form action url
+    var request_method = $(this).attr("method"); //get form GET/POST method
+    var form_data = new FormData(this); //Encode form elements for submission
+
+    $.ajax({
+        "async": true,
+        "crossDomain": true,
+        url: post_url,
+        type: request_method,
+        data: form_data,
+		contentType: false,
+		processData: false,
+		"mimeType": "multipart/form-data",
+		"headers": {
+    "Content-Type": "multipart/form-data"
+  },
+		xhr: function(){
+		//upload Progress
+		var xhr = $.ajaxSettings.xhr();
+		if (xhr.upload) {
+			xhr.upload.addEventListener('progress', function(event) {
+				var percent = 0;
+				var position = event.loaded || event.position;
+				var total = event.total;
+				if (event.lengthComputable) {
+					percent = Math.ceil(position / total * 100);
+				}
+				//update progressbar
+				$("#upload-progress .progress-bar").css("width", + percent +"%");
+			}, true);
+		}
+		return xhr;
+	}
+    }).done(function(response){ //
+        $("#server-results").html(response);
+    });
+});
+  </script>
+
+  </body>
+</html>

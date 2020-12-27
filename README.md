@@ -17,3 +17,22 @@ Open `http://localhost:8000/docs`
 https://jxl.photos
 
 https://avif.photos
+
+## AVIF
+
+* Royalty free
+* Very efficient
+* Has some adoption
+* Slow (for now)
+
+## JPEG XL
+
+* Very new
+* Allows lossless compression and decompression of JPEGs
+
+## See also
+
+* [makejxl](https://github.com/varnav/makejxl/)
+* [makeavif](https://github.com/varnav/makeavif/)
+* [filmcompress](https://github.com/varnav/filmcompress/)
+

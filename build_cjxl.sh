@@ -7,7 +7,8 @@ fi
 
 set -ex
 
-DEBIAN_FRONTEND=noninteractive
+export MAKEFLAGS=-j$(nproc --ignore=2)
+export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
 apt-get -y install python3-pip git wget ca-certificates cmake pkg-config libbrotli-dev libgif-dev libjpeg-dev libopenexr-dev libpng-dev libwebp-dev clang-7

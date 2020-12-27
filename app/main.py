@@ -8,20 +8,24 @@ from subprocess import run
 from urllib import parse
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.executors.pool import ProcessPoolExecutor
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.requests import Request
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 TTL = 300
 JXL_SUPPORTED_FORMATS = ['jpeg', 'jpg', 'png', 'apng', 'gif', 'exr', 'ppm', 'pfm', 'pgx']
 AVIF_SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "y4m"]
 
-scheduler = BackgroundScheduler()
+# Scheduler
+executors = {
+    'default': ProcessPoolExecutor(20)
+}
+scheduler = BackgroundScheduler(executors=executors)
 scheduler.start()
-app = FastAPI(title="JPEG XL API", version=__version__, openapi_url="/api/v1/openapi.json")
-# app = FastAPI(title="JPEG XL API", version=__version__, root_path="/api/v1")
+app = FastAPI(title="mifapi: Modern Image Formats (JPEG XL and AVIF) API", version=__version__, openapi_url="/api/v1/openapi.json")
 
 mimetypes.init()
 mimetypes.add_type('image/jxl', '.jxl')
@@ -40,7 +44,7 @@ if jobs == 0:
     jobs = 1
 
 
-async def cleanup(file1, file2):
+def cleanup(file1, file2):
     print('Deleting:', file1, file2)
     os.remove(file1)
     os.remove(file2)
@@ -49,12 +53,16 @@ async def cleanup(file1, file2):
 def encodejxl(fp, newpath):
     print("Async encode", fp, newpath)
     speed = 'kitten'
-    convert_cmd = f'/usr/bin/cjxl --quiet -s {speed} --num_threads={jobs} "{fp}" "{newpath}"'
+    convert_cmd = f'/usr/bin/cjxl -s {speed} --num_threads={jobs} "{fp}" "{newpath}"'
     print(convert_cmd)
     run(convert_cmd, shell=True)
 
 
 def encodeavif(fp, newpath, codec):
+    """
+
+    :type codec: ['aom', 'svt', 'rav1e']
+    """
     print("Async encode", fp, newpath, codec)
     speed = 9
     convert_cmd = f'avifenc -j {jobs} -c {codec} -s {speed} {fp} -o {newpath}'
@@ -170,7 +178,6 @@ def decode_jpg(request: Request, file: UploadFile = File(...)):
         f = open(fp, 'wb')
         f.write(file.file.read())
         f.close()
-        speed = 'kitten'
         convert_cmd = f'/usr/bin/djxl --jpeg "{fp}" "{newpath}"'
         print(convert_cmd)
         job = run(convert_cmd, shell=True)
