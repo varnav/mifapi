@@ -3,8 +3,7 @@
 * File transcoding happens in RAM only, files are not saved, and deleted after some time (300 seconds by default)
 * All components of the app will correctly utilize multiple CPU cores
 * Mandatory AVX2 support improves performance
-* Asyncronous converters will output dowload URL of the file, but actual transcoding will be done few seconds later, and
-not guaranteed to succeed
+* Asyncronous converters (optional) will output dowload URL of the file, but actual transcoding will be done few seconds later, and not guaranteed to succeed
 
 ## Live demo
 
