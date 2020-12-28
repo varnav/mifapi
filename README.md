@@ -5,12 +5,20 @@
 * File transcoding happens in RAM only, files are not saved, and deleted after some time (300 seconds by default)
 * All components of the app will correctly utilize multiple CPU cores
 * Mandatory AVX2 support improves performance
+* Uses latest versions of tools and libraries
 * Asyncronous converters (optional) will output dowload URL of the file, but actual transcoding will be done few seconds later, and not guaranteed to succeed
 * JPEG served us well for decades. Time to dethrone it.
 
+## API documentation
+
+[Swagger](https://jxl.photos/docs)
+
+[Redoc](https://jxl.photos/redoc)
+
 ## Live demo
 
-https://jxl.photos  
+https://jxl.photos
+
 https://avif.photos
 
 ## How to use
@@ -20,6 +28,10 @@ https://avif.photos
 ```sh
 curl -X POST "https://jxl.photos/api/v1/jxl/encode" -H  "accept: application/json" -H  "Content-Type: multipart/form-data" -F "file=@IMG_20201219_142048.JPG;type=image/jpeg" | python3 -c "import sys, json; print(json.load(sys.stdin)['dl_uri'])" | xargs -n1 curl -O
 ```
+
+### Python
+
+[sample_request.py](sample_request.py)
 
 ## Run app quickly
 
@@ -63,9 +75,9 @@ docker run -d --name mifapi --restart on-failure:10 --security-opt no-new-privil
 
 * EXIF preservation is unclear
 
-## See also
+## Other CLI tools
 
-* [makejxl](https://github.com/varnav/makejxl/)
-* [makeavif](https://github.com/varnav/makeavif/)
-* [filmcompress](https://github.com/varnav/filmcompress/)
-* [optimize-images](https://github.com/victordomingos/optimize-images/)
+* [makejxl](https://github.com/varnav/makejxl/) - Converter to JPEG XL
+* [makeavif](https://github.com/varnav/makeavif/) - Converter to AVIF
+* [squoosh CLI](https://github.com/GoogleChromeLabs/squoosh/tree/dev/cli) - Converter/optimizer from Google
+* [optimize-images](https://github.com/victordomingos/optimize-images/) - JPEG optimizer
