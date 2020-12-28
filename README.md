@@ -1,9 +1,12 @@
+[![Docker Pulls](https://img.shields.io/docker/pulls/varnav/mifapi.svg)](https://hub.docker.com/r/varnav/mifapi) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT/)
+
 # mifapi: Modern Image Formats (JPEG XL and AVIF) Web API
 
 * File transcoding happens in RAM only, files are not saved, and deleted after some time (300 seconds by default)
 * All components of the app will correctly utilize multiple CPU cores
 * Mandatory AVX2 support improves performance
 * Asyncronous converters (optional) will output dowload URL of the file, but actual transcoding will be done few seconds later, and not guaranteed to succeed
+* JPEG served us well for decades. Time to dethrone it.
 
 ## Live demo
 
@@ -20,7 +23,7 @@ curl -X POST "https://jxl.photos/api/v1/jxl/encode" -H  "accept: application/jso
 
 ## Run app quickly
 
-You will need `cjxl`, `djxl`, `avifenc` in PATH. You can get it by running `build_cjxl.sh` and `build_avif.sh` as root.
+You will need [cjxl/djxl](https://gitlab.com/wg1/jpeg-xl), [avifenc](https://github.com/AOMediaCodec/libavif) in PATH. You can get it by running `build_cjxl.sh` and `build_avif.sh` as root.
 
 ```sh
 poetry install
@@ -51,10 +54,18 @@ docker run -d --name mifapi --restart on-failure:10 --security-opt no-new-privil
 * Very new
 * Allows lossless compression and decompression of JPEGs
 
+## TODO
+
+* Optimized defaults
+* More parameters to tune conversion
+
+## Known issues
+
+* EXIF preservation is unclear
+
 ## See also
 
 * [makejxl](https://github.com/varnav/makejxl/)
 * [makeavif](https://github.com/varnav/makeavif/)
 * [filmcompress](https://github.com/varnav/filmcompress/)
-
-JPEG served us well for decades. Time to dethrone it.
+* [optimize-images](https://github.com/victordomingos/optimize-images/)
