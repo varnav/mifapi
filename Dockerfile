@@ -24,9 +24,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 #ENV ACCESS_LOG=/var/log/gunicorn/access.log
 #ENV ERROR_LOG=/var/log/gunicorn/error.log
 
-# Compile with forced AVX2 support
+# Compile with forced AVX2 support (conservative)
 ENV RUSTFLAGS="-C target-feature=+avx2,+fma"
 ENV CFLAGS="-mavx2 -mfma -ftree-vectorize -pipe"
+
+# Compile for current CPU only - may increase performance
+# ENV RUSTFLAGS="-C target-cpu=native"
+# ENV CFLAGS="-march=native -pipe"
+
 ENV CXXFLAGS="${CFLAGS}"
 
 COPY --from=builder /tmp/jpeg-xl/build/tools/djxl /tmp/jpeg-xl/build/tools/cjxl /tmp/libavif/build/avifenc /usr/bin/
@@ -38,7 +43,7 @@ RUN set -ex && \
     python -m pip install -U pip && \
     python -m pip install poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-dev
+    poetry install
 
 RUN apt-get update && apt-get install --no-install-recommends -y libgif-dev nginx software-properties-common ca-certificates && \
     mkdir /tmp/mifapi_temp && \

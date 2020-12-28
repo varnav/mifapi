@@ -15,6 +15,10 @@
 
 [Redoc](https://jxl.photos/redoc)
 
+## Client library
+
+* [pymifapi](https://github.com/varnav/pymifapi/)
+
 ## Live demo
 
 https://jxl.photos
