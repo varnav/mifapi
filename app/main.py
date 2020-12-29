@@ -1,3 +1,4 @@
+import shlex
 import datetime
 import mimetypes
 import os
@@ -81,7 +82,7 @@ def encodejxl(fp, newpath):
     speed = 'kitten'
     convert_cmd = f'/usr/bin/cjxl -s {speed} --num_threads={jobs} "{fp}" "{newpath}"'
     print(convert_cmd)
-    job = run(convert_cmd, shell=True)
+    job = run(shlex.split(convert_cmd))
     if job.returncode == 0:
         saved = os.path.getsize(fp) - os.path.getsize(newpath)
         return saved
@@ -98,7 +99,7 @@ def encodeavif(fp, newpath, codec):
     speed = 9
     convert_cmd = f'avifenc -d 8 -y 420 -j {jobs} -c {codec} -s {speed} {fp} -o {newpath}'
     print(convert_cmd)
-    job = run(convert_cmd, shell=True)
+    job = run(shlex.split(convert_cmd))
     if job.returncode == 0:
         saved = os.path.getsize(fp) - os.path.getsize(newpath)
         return saved
@@ -241,7 +242,7 @@ def decode_jpg(request: Request, file: UploadFile = File(...)):
         f.close()
         convert_cmd = f'/usr/bin/djxl --jpeg "{fp}" "{newpath}"'
         print(convert_cmd)
-        job = run(convert_cmd, shell=True)
+        job = run(shlex.split(convert_cmd))
         if job.returncode == 0:
             lost = os.path.getsize(fp) - os.path.getsize(newpath)
             expires = (datetime.datetime.now() + datetime.timedelta(seconds=TTL)).replace(tzinfo=pytz.UTC)
