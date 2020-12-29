@@ -11,9 +11,9 @@
 
 ## API documentation
 
-[Swagger](https://jxl.photos/docs)
+* [Swagger](https://jxl.photos/docs)
 
-[Redoc](https://jxl.photos/redoc)
+* [Redoc](https://jxl.photos/redoc)
 
 ## Client library
 
@@ -21,9 +21,9 @@
 
 ## Live demo
 
-https://jxl.photos
+* https://jxl.photos
 
-https://avif.photos
+* https://avif.photos
 
 ## How to use
 
@@ -35,7 +35,7 @@ curl -X POST "https://jxl.photos/api/v1/jxl/encode" -H  "accept: application/jso
 
 ### Python
 
-[sample_request.py](sample_request.py)
+* [sample_request.py](sample_request.py)
 
 ## Run app quickly
 
