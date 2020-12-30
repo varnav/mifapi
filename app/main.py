@@ -1,4 +1,3 @@
-import shlex
 import datetime
 import mimetypes
 import os
@@ -80,9 +79,9 @@ scheduler.add_listener(my_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 def encodejxl(fp, newpath):
     print("Encode", fp, newpath)
     speed = 'kitten'
-    convert_cmd = f'/usr/bin/cjxl -s {speed} --num_threads={jobs} "{fp}" "{newpath}"'
+    convert_cmd = ['/usr/bin/cjxl', '-s', speed, f'--num_threads={jobs}', fp, newpath]
     print(convert_cmd)
-    job = run(shlex.split(convert_cmd))
+    job = run(convert_cmd)
     if job.returncode == 0:
         saved = os.path.getsize(fp) - os.path.getsize(newpath)
         return saved
@@ -93,13 +92,17 @@ def encodejxl(fp, newpath):
 def encodeavif(fp, newpath, codec):
     """
 
+    :param newpath:
+    :param fp:
     :type codec: ['aom', 'svt', 'rav1e']
     """
     print("Encode", fp, newpath, codec)
     speed = 9
-    convert_cmd = f'avifenc -d 8 -y 420 -j {jobs} -c {codec} -s {speed} {fp} -o {newpath}'
+    bitdepth = 8
+    yuv = 420
+    convert_cmd = ['avifenc', '-d', str(bitdepth), '-y', str(yuv), '-j', str(jobs), '-c', codec, '-s', str(speed), fp, '-o', newpath]
     print(convert_cmd)
-    job = run(shlex.split(convert_cmd))
+    job = run(convert_cmd)
     if job.returncode == 0:
         saved = os.path.getsize(fp) - os.path.getsize(newpath)
         return saved
@@ -142,12 +145,6 @@ class Decoded(BaseModel):
 @app.get("/api/v1/version", response_model=Version, summary="Return versions of used libraries")
 def version():
     return {"ver": __version__, "cjxl_ver": run(['cjxl', '--version'], capture_output=True).stdout, "avifenc_ver": run(['avifenc', '--version'], capture_output=True).stdout}
-
-
-@app.get("/api/v1/cleanup", summary="Force cleanup job")
-def version():
-    files_cleaned = cleanup()
-    return {"files_cleaned": files_cleaned}
 
 
 @app.post("/api/v1/jxl/encode", response_model=Encoded, summary="Encode file into jxl (lossless if JPEG)")
@@ -240,9 +237,9 @@ def decode_jpg(request: Request, file: UploadFile = File(...)):
         f = open(fp, 'wb')
         f.write(file.file.read())
         f.close()
-        convert_cmd = f'/usr/bin/djxl --jpeg "{fp}" "{newpath}"'
+        convert_cmd = ['/usr/bin/djxl', '--jpeg', fp, newpath]
         print(convert_cmd)
-        job = run(shlex.split(convert_cmd))
+        job = run(convert_cmd)
         if job.returncode == 0:
             lost = os.path.getsize(fp) - os.path.getsize(newpath)
             expires = (datetime.datetime.now() + datetime.timedelta(seconds=TTL)).replace(tzinfo=pytz.UTC)

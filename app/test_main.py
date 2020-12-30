@@ -145,7 +145,3 @@ def test_download_8():
 def test_download_ne():
     response = client.get("/getfile/notexists.avif")
     assert response.status_code == 404
-
-def test_cleanup():
-    response = client.get("/api/v1/cleanup")
-    assert response.status_code == 200
