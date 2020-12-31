@@ -3,11 +3,12 @@
 # mifapi: Modern Image Formats (JPEG XL and AVIF) Web API
 
 * File transcoding happens in RAM only, files are not saved, and deleted after some time (300 seconds by default)
-* All components of the app will correctly utilize multiple CPU cores
-* Mandatory AVX2 support improves performance
+* All components of the app will correctly utilize multiple CPU cores, AVX2 support is mandatory
 * Uses latest versions of tools and libraries
+* [A+ rated](https://www.ssllabs.com/ssltest/analyze.html?d=avif.photos) SSL configuration with TLS 1.3 and HTTP/2
 * Asyncronous converters (optional) will output dowload URL of the file, but actual transcoding will be done few seconds later, and not guaranteed to succeed
-* JPEG served us well for decades. Time to dethrone it.
+
+JPEG served us well for decades. Time to dethrone it.
 
 ## API documentation
 
@@ -51,7 +52,7 @@ Open `http://localhost:8000/docs`
 
 ## Run app in production
 
-[Dockerfile](Dockerfile) will build necessary tools and run app behind nginx with SSL 1.3 and http/2 support. You may use letsencrypt (default) or your own certs. You need to edit [nginx.conf](nginx.conf) for your own needs. Then you can build docker image and run it this way:
+[Dockerfile](Dockerfile) will build necessary tools and run app behind nginx. You may use letsencrypt (default) or your own certs. You need to edit [nginx.conf](nginx.conf) for your own needs. Then you can build docker image and run it this way:
 
 ```sh
 docker build -t mycoolcompany/mifapi .

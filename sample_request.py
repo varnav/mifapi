@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Sample file conversion with mifapi
 # https://github.com/varnav/mifapi
 # Evgeny Varnavskiy 2020
