@@ -62,7 +62,7 @@ docker run -d --name mifapi --restart on-failure:10 --security-opt no-new-privil
 ## AVIF
 
 * Royalty free
-* Very efficient
+* Very efficient at low bitrates
 * Has some adoption
 * Slow (for now)
 
@@ -70,6 +70,7 @@ docker run -d --name mifapi --restart on-failure:10 --security-opt no-new-privil
 
 * Very new
 * Allows lossless compression and decompression of JPEGs
+* Best for high quality high bitrate images
 
 ## TODO
 
@@ -79,6 +80,7 @@ docker run -d --name mifapi --restart on-failure:10 --security-opt no-new-privil
 ## Known issues
 
 * EXIF preservation is unclear
+* SVT and RAV1E encoders support is experimental. Practical usefulness currently is low.
 
 ## Other CLI tools
 

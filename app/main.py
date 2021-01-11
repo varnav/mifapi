@@ -156,7 +156,7 @@ def encode_jxl(request: Request, file: UploadFile = File(...)):
     fp = pathlib.PurePath(tempdir + os.sep + file.filename)
     newfilename = str(fp.stem) + '.' + 'jxl'
     newpath = tempdir + os.sep + newfilename
-    if os.path.exists(newpath) or os.path.exists(fp):
+    if os.path.exists(newpath):
         raise HTTPException(status_code=409, detail="File exists")
     else:
         f = open(fp, 'wb')
@@ -175,7 +175,7 @@ async def encode_jxl_async(request: Request, file: UploadFile = File(...)):
     fp = pathlib.PurePath(tempdir + os.sep + file.filename)
     newfilename = str(fp.stem) + '.' + 'jxl'
     newpath = tempdir + os.sep + newfilename
-    if os.path.exists(newpath) or os.path.exists(fp):
+    if os.path.exists(newpath):
         raise HTTPException(status_code=409, detail="File exists")
     else:
         f = open(fp, 'wb')
