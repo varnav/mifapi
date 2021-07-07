@@ -1,6 +1,13 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/varnav/mifapi.svg)](https://hub.docker.com/r/varnav/mifapi) [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT/)
 
-# mifapi: Modern Image Formats (JPEG XL and AVIF) Web API
+---
+**NOTE**
+
+`avif.photos` webservice is currently down because I don't really want to pay for it, so links are not functional. Please spin up your own copy.
+
+---
+
+# mifapi: Modern Image Formats (JPEG XL and AVIF) Web API Service
 
 * File transcoding happens in RAM only, files are not saved, and deleted after some time (300 seconds by default)
 * All components of the app will correctly utilize multiple CPU cores, AVX2 support is mandatory
@@ -65,6 +72,7 @@ docker run -d --name mifapi --restart on-failure:10 --security-opt no-new-privil
 * Very efficient at low bitrates
 * Has some adoption
 * Slow (for now)
+* May be bad at low bitrates (loss of detail)
 
 ## JPEG XL
 
@@ -82,7 +90,7 @@ docker run -d --name mifapi --restart on-failure:10 --security-opt no-new-privil
 * EXIF preservation is unclear
 * SVT and RAV1E encoders support is experimental. Practical usefulness currently is low.
 
-## Other CLI tools
+## Other tools
 
 * [makejxl](https://github.com/varnav/makejxl/) - Converter to JPEG XL
 * [makeavif](https://github.com/varnav/makeavif/) - Converter to AVIF
