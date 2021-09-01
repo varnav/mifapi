@@ -1,4 +1,4 @@
-FROM python:3 as builder
+FROM python:3.9-buster as builder
 
 COPY ./build_cjxl.sh .
 RUN /bin/bash ./build_cjxl.sh
@@ -14,7 +14,7 @@ LABEL Description="mifapi: Modern Image Formats (JPEG XL and AVIF) Web API"
 LABEL License="MIT License"
 
 LABEL org.label-schema.schema-version="1.0"
-LABEL org.label-schema.url="https://avif.photos"
+#LABEL org.label-schema.url="https://avif.photos"
 LABEL org.label-schema.vcs-url="https://github.com/varnav/mifapi"
 LABEL org.label-schema.docker.cmd="docker run -d --name mifapi --restart on-failure:10 --security-opt no-new-privileges --tmpfs /tmp/mifapi_temp -p 80:80 -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt mycoolcompany/mifapi"
 LABEL org.label-schema.docker.cmd.test="docker run --rm -it --tmpfs /tmp/mifapi_temp --entrypoint /app/pytest.sh varnav/mifapi"
@@ -34,7 +34,7 @@ ENV CFLAGS="-mavx2 -mfma -ftree-vectorize -pipe"
 
 ENV CXXFLAGS="${CFLAGS}"
 
-COPY --from=builder /tmp/jpeg-xl/build/tools/djxl /tmp/jpeg-xl/build/tools/cjxl /tmp/libavif/build/avifenc /usr/bin/
+COPY --from=builder /tmp/libjxl/build/tools/djxl /tmp/libjxl/build/tools/cjxl /tmp/libavif/build/avifenc /usr/bin/
 
 COPY ./pyproject.toml .
 

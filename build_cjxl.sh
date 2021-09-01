@@ -15,13 +15,12 @@ export MAKEFLAGS=-j$(nproc --ignore=2)
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
-apt-get -y install python3-pip git wget ca-certificates cmake pkg-config libbrotli-dev libgif-dev libjpeg-dev libopenexr-dev libpng-dev libwebp-dev clang-7
-export CC=clang-7 CXX=clang++-7
+apt-get -y install python3-pip git wget ca-certificates cmake pkg-config libbrotli-dev libgif-dev libjpeg-dev libopenexr-dev libpng-dev libwebp-dev clang
 
 cd /tmp/
-rm -rf jpeg-xl
-git clone https://gitlab.com/wg1/jpeg-xl.git --recursive
-cd jpeg-xl
+rm -rf libjxl
+git clone https://github.com/libjxl/libjxl.git --recursive
+cd libjxl
 rm -rf build
 mkdir build
 cd build
