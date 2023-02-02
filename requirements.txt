@@ -1,4 +1,4 @@
-APScheduler>=3.6.3
-fastapi>=0.63.0
-pydantic>=1.7.3
-pytz>=2020.5
+APScheduler>=3.9.1
+fastapi>=0.89.1
+pydantic>=1.10.4
+pytz>=2022.7.1

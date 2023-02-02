@@ -1,4 +1,4 @@
-FROM python:3.9-buster as builder
+FROM python:3.10-buster as builder
 
 COPY ./build_cjxl.sh .
 RUN /bin/bash ./build_cjxl.sh
@@ -7,7 +7,7 @@ COPY ./build_avif.sh .
 RUN /bin/bash ./build_avif.sh
 
 # Docs https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
 
 LABEL Maintainer = "Evgeny Varnavskiy <varnavruz@gmail.com>"
 LABEL Description="mifapi: Modern Image Formats (JPEG XL and AVIF) Web API"
