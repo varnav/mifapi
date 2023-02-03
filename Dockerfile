@@ -41,8 +41,8 @@ COPY ./pyproject.toml .
 
 RUN set -ex && \
     mkdir /html && \
-    python -m pip install -U pip && \
-    python -m pip install poetry && \
+    python -m pip install --no-cache-dir -U pip && \
+    python -m pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
     poetry install
 

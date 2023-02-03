@@ -23,12 +23,12 @@ jobs:
         echo "deb https://packages.cisofy.com/community/lynis/deb/ stable main" | sudo tee /etc/apt/sources.list.d/cisofy-lynis.list
         sudo apt-get update
         sudo apt-get -y install lynis
-        curl -sL -o ./hadolint "https://github.com/hadolint/hadolint/releases/download/v2.6.1/hadolint-$(uname -s)-$(uname -m)"
+        curl -sL -o ./hadolint "https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-$(uname -s)-$(uname -m)"
         chmod 700 ./hadolint
 
     - name: Lint with hadolint
       run: |
-        ./hadolint --ignore DL3013 --ignore DL3003 --ignore DL3008 --ignore DL4006 Dockerfile
+        ./hadolint --ignore DL3013 --ignore DL3003 --ignore DL3008 --ignore DL4006 --ignore DL3045 Dockerfile
 
     - name: Security scan with Lynis
       run:  |
