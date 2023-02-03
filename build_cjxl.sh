@@ -19,7 +19,7 @@ apt-get -y install python3-pip git wget ca-certificates cmake pkg-config libbrot
 
 cd /tmp/
 rm -rf libjxl
-git clone https://github.com/libjxl/libjxl.git --recursive
+git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules
 cd libjxl
 rm -rf build
 mkdir build

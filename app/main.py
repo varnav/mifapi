@@ -79,8 +79,7 @@ scheduler.add_listener(my_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
 def encodejxl(fp, newpath):
     print("Encode", fp, newpath)
-    speed = 'kitten'
-    convert_cmd = ['/usr/bin/cjxl', '-s', speed, f'--num_threads={jobs}', fp, newpath]
+    convert_cmd = ['/usr/bin/cjxl', f'--num_threads={jobs}', fp, newpath]
     print(convert_cmd)
     job = run(convert_cmd)
     if job.returncode == 0:

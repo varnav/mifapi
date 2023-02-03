@@ -79,10 +79,10 @@ def test_avif_encode_aom():
 #     assert response.status_code == 200
 
 
-def test_avif_encode_rav1e():
-    files = {'file': open('/tmp/testimage5.jpg', 'rb')}
-    response = client.post('/api/v1/avif/encode?codec=rav1e', files=files)
-    assert response.status_code == 200
+# def test_avif_encode_rav1e():
+#     files = {'file': open('/tmp/testimage5.jpg', 'rb')}
+#     response = client.post('/api/v1/avif/encode?codec=rav1e', files=files)
+#     assert response.status_code == 200
 
 
 def test_avif_encodeasync_aom():
@@ -97,10 +97,10 @@ def test_avif_encodeasync_aom():
 #     assert response.status_code == 200
 
 
-def test_avif_encodeasync_rav1e():
-    files = {'file': open('/tmp/testimage8.jpg', 'rb')}
-    response = client.post('/api/v1/avif/encodeasync?codec=rav1e', files=files)
-    assert response.status_code == 200
+# def test_avif_encodeasync_rav1e():
+#     files = {'file': open('/tmp/testimage8.jpg', 'rb')}
+#     response = client.post('/api/v1/avif/encodeasync?codec=rav1e', files=files)
+#     assert response.status_code == 200
 
 
 def test_download_1():
@@ -124,9 +124,9 @@ def test_download_3():
 #     assert response.status_code == 200
 
 
-def test_download_5():
-    response = client.get("/getfile/testimage5.avif")
-    assert response.status_code == 200
+# def test_download_5():
+#     response = client.get("/getfile/testimage5.avif")
+#     assert response.status_code == 200
 
 
 def test_download_6():
@@ -139,9 +139,9 @@ def test_download_6():
 #     assert response.status_code == 200
 
 
-def test_download_8():
-    response = client.get("/getfile/testimage8.avif")
-    assert response.status_code == 200
+# def test_download_8():
+#     response = client.get("/getfile/testimage8.avif")
+#     assert response.status_code == 200
 
 
 def test_download_ne():

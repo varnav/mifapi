@@ -1,10 +1,10 @@
-FROM python:3.10-buster as builder
-
-COPY ./build_cjxl.sh .
-RUN /bin/bash ./build_cjxl.sh
+FROM python:3.10-bullseye as builder
 
 COPY ./build_avif.sh .
 RUN /bin/bash ./build_avif.sh
+
+COPY ./build_cjxl.sh .
+RUN /bin/bash ./build_cjxl.sh
 
 # Docs https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
@@ -35,6 +35,7 @@ ENV CFLAGS="-mavx2 -mfma -ftree-vectorize -pipe"
 ENV CXXFLAGS="${CFLAGS}"
 
 COPY --from=builder /tmp/libjxl/build/tools/djxl /tmp/libjxl/build/tools/cjxl /tmp/libavif/build/avifenc /usr/bin/
+COPY --from=builder /tmp/libjxl/build/*.so* /usr/local/lib/
 
 COPY ./pyproject.toml .
 
@@ -51,7 +52,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y libgif-dev ngin
     chmod 777 /tmp/mifapi_temp && \
     ln -s /tmp/mifapi_temp /html/getfile && \
     nginx -t && \
-    python -m pip install tailon pytest certbot certbot-nginx && \
+    python -m pip install --no-cache-dir tailon pytest certbot certbot-nginx && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
