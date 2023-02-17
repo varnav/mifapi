@@ -13,7 +13,7 @@
 * All components of the app will correctly utilize multiple CPU cores, AVX2 support is mandatory
 * Uses latest versions of tools and libraries
 * [A+ rated](https://www.ssllabs.com/ssltest/analyze.html?d=avif.photos) SSL configuration with TLS 1.3 and HTTP/2
-* Asyncronous converters (optional) will output dowload URL of the file, but actual transcoding will be done few seconds later, and not guaranteed to succeed
+* Asynchronous converters (optional) will output download URL of the file, but actual transcoding will be done few seconds later, and not guaranteed to succeed
 
 JPEG served us well for decades. Time to dethrone it.
 
